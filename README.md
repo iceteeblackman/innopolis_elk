@@ -1,2 +1,5 @@
-# innopolis_elk
-Установка стека ELK на Centos8
+# Innopolis_elk
+
+Катает саму простую конфигу с ELK + filebeat
+
+

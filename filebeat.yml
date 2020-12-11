@@ -1,0 +1,9 @@
+---
+#
+# Playbook to install the Beats
+#
+- hosts: client
+  become: yes
+  become_user: root
+  roles:
+  - { role: filebeat }

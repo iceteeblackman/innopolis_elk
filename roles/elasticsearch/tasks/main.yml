@@ -1,0 +1,64 @@
+---
+#
+# Installing Elasticsearch
+#
+
+# Add Elasticsearch rpm key
+
+- name: Import ElasticSearch GPG Key
+  rpm_key: key=http://packages.elastic.co/GPG-KEY-elasticsearch
+    state=present
+  become: true
+
+# Add the Elasticsearch apt repo. For versions 6 of the stack - use '6.x-prerelease':
+
+- name: Copy elasticsearch yum repo file
+  copy:
+    src=elasticsearch.repo
+    dest=/etc/yum.repos.d/elasticsearch.repo
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+# Installing Elasticsearch
+
+- name: Install elasticsearch and openjdk
+  yum:
+    name: [elasticsearch, java-1.8.0-openjdk-headless]
+  become: true
+   
+# Update Elasticsearch config file to allow access (to secure Elasticsearch, bind to 'localhost'). 
+
+- name: Updating the config file to allow outside access
+  lineinfile:
+   destfile: /etc/elasticsearch/elasticsearch.yml
+   regexp: 'network.host:'
+   line: 'network.host: 127.0.0.1'
+ 
+# Update Elasticsearch port in config file 
+
+- name: Updating the port in config file 
+  lineinfile:
+   destfile: /etc/elasticsearch/elasticsearch.yml
+   regexp: 'http.port:'
+   line: 'http.port: 9200'
+ 
+# Start Elasticsearch and create data dir
+- name: Create datadir for elasticsearch
+  file:
+    path: /usr/share/elasticsearch/data
+    state: directory
+    owner: elasticsearch
+    group: elasticsearch
+    mode: 0755
+
+- name: Start or restart elasticsearch service
+  command: systemctl restart elasticsearch.service
+  ignore_errors: true
+  become: true
+
+- name: Setup elasticsearch service to autostart
+  service: name=elasticsearch state=started enabled=true
+  become: true
+

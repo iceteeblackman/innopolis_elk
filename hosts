@@ -1,0 +1,5 @@
+[all]
+elk001 ansible_ssh_host=10.90.138.173 ansible_ssh_user=root
+
+[client]
+nginx001 ansible_ssh_host=10.90.138.172 ansible_ssh_user=root

@@ -1,0 +1,26 @@
+---
+#
+# Installing Filebeat
+#
+
+# Install Filebeat 
+
+- name: Install Filebeat rpms
+  yum:
+    name: [epel-release, filebeat]
+  become: true
+
+- name: Copy logstash config file FILTER
+  copy:
+    src=filebeat.yml
+    dest=/etc/filebeat/
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+# Starting Filebeat
+
+- name: Setup Filebeat service
+  service: name=filebeat state=started enabled=true
+  become: true

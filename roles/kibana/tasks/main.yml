@@ -1,0 +1,66 @@
+---
+#
+# Installing Kibana
+#
+
+# Install Kibana 
+
+- name: Copy kibana yum repo file
+  copy:
+    src=kibana.repo
+    dest=/etc/yum.repos.d/kibana.repo
+    owner=root
+    group=root
+    mode=0644
+  become: true
+
+- name: Install kibana rpms
+  yum:
+    name: [kibana, unzip]
+  become: true
+ 
+# Configurations
+
+- name: Updating the config file to allow outside access
+  lineinfile:
+   destfile: /etc/kibana/kibana.yml
+   regexp: 'server.host:'
+   line: 'server.host: 0.0.0.0'
+
+- name: Defining server port
+  lineinfile:
+   destfile: /etc/kibana/kibana.yml
+   regexp: 'server.port:'
+   line: 'server.port: 5601'
+    
+- name: Defining Elasticsearch URL
+  lineinfile:
+   destfile: /etc/kibana/kibana.yml
+   regexp: 'elasticsearch.url:'
+   line: 'elasticsearch.url: "http://127.0.0.1:9200"'
+   
+# Starting Kibana
+
+- name: Setup kibana service
+  service: name=kibana state=started enabled=true
+  become: true
+
+- name: Wait for elasticsearch index to be available
+  uri:
+    url: http://localhost:9200/_cat/indices
+    status_code: 200
+  register: es_service_result
+  until: es_service_result.status == 200
+  retries: 50
+  delay: 10
+  become: true
+
+# Change firewall zone
+
+- name: Set active zone
+  firewalld:
+    zone: trusted
+    interface: eth0
+    state: enabled
+    immediate: yes
+    permanent: true
