@@ -4,16 +4,19 @@
 #
 
 # Install Filebeat 
+- name: Set filebeat repo
+  shell:
+    cmd: curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.5.1-x86_64.rpm
 
 - name: Install Filebeat rpms
-  yum:
-    name: [epel-release, filebeat]
-  become: true
+  shell:
+    cmd: rpm -vi filebeat-7.5.1-x86_64.rpm
+  ignore_errors: true
 
-- name: Copy logstash config file FILTER
+- name: Copy filebeat config
   copy:
     src=filebeat.yml
-    dest=/etc/filebeat/
+    dest=/etc/filebeat/filebeat.yml
     owner=root
     group=root
     mode=0644

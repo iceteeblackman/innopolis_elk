@@ -18,4 +18,9 @@ filebeat.inputs:
   scan_frequency: 5s
 
 output.logstash:
-  hosts: ["{{ ansible_ssh_host }}:5044"]
+  hosts: ["10.90.138.173:5044"]
+
+xpack.monitoring:
+  enabled: true
+  elasticsearch:
+    hosts: ["http://10.90.138.173:9200"]
